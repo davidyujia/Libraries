@@ -4,7 +4,7 @@
 class Program
 {
     private static QueueProcess<int> _process;
-    
+
     static void Main(string[] args)
     {
         _process = new QueueProcess<int>(item =>{
@@ -14,7 +14,8 @@ class Program
         {
             _process.Add(i);
         });
-        
+
         Console.Read();
     }
+}
 ```
