@@ -4,21 +4,29 @@ using System.Threading.Tasks;
 
 namespace QueueProcess
 {
-    public class QueueProcess<T>
+    public sealed class QueueProcess<T>
     {
-        private readonly Action<T> _action;
-
         public QueueProcess(Action<T> action)
         {
             _action = action;
             this._queue = new ConcurrentQueue<T>();
         }
 
+        private readonly Action<T> _action;
+
         private readonly ConcurrentQueue<T> _queue;
 
         private Task _task;
 
         private readonly object _lock = new object();
+
+        private void Run()
+        {
+            while (this._queue.TryDequeue(out T item))
+            {
+                _action(item);
+            }
+        }
 
         public async Task AddAsync(T item) => await Task.Factory.StartNew(() => Add(item));
 
@@ -36,14 +44,6 @@ namespace QueueProcess
                         _task.Start();
                     }
                 }
-            }
-        }
-
-        private void Run()
-        {
-            while (this._queue.TryDequeue(out T item))
-            {
-                _action(item);
             }
         }
     }
