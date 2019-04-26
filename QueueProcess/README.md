@@ -10,6 +10,7 @@ class Program
         _process = new QueueProcess<int>(item => {
             Console.WriteLine(item);
         });
+
         Parallel.For(0, 100, (i, loopState) =>
         {
             _process.Add(i);
