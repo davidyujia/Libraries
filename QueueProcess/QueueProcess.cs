@@ -9,7 +9,7 @@ namespace QueueProcess
         public QueueProcess(Action<T> action)
         {
             _action = action;
-            this._queue = new ConcurrentQueue<T>();
+            _queue = new ConcurrentQueue<T>();
         }
 
         private readonly Action<T> _action;
@@ -22,7 +22,7 @@ namespace QueueProcess
 
         private void Run()
         {
-            while (this._queue.TryDequeue(out T item))
+            while (_queue.TryDequeue(out var item))
             {
                 _action(item);
             }
@@ -30,20 +30,26 @@ namespace QueueProcess
 
         public async Task AddAsync(T item) => await Task.Factory.StartNew(() => Add(item));
 
+        private bool IsTaskRunning => _task == null || _task.Status != TaskStatus.Running;
+
         public void Add(T item)
         {
-            this._queue.Enqueue(item);
+            _queue.Enqueue(item);
 
-            if (_task == null || this._task.Status != TaskStatus.Running)
+            if (!IsTaskRunning)
             {
-                lock (_lock)
+                return;
+            }
+
+            lock (_lock)
+            {
+                if (!IsTaskRunning)
                 {
-                    if (_task == null || this._task.Status != TaskStatus.Running)
-                    {
-                        _task = new Task(this.Run);
-                        _task.Start();
-                    }
+                    return;
                 }
+
+                _task = new Task(this.Run);
+                _task.Start();
             }
         }
     }
