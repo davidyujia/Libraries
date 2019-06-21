@@ -52,5 +52,10 @@ namespace davidyujia.Process.QueueProcess
                 _task.Start();
             }
         }
+
+        public void Wait()
+        {
+            Thread.SpinWait(!IsTaskRunning);
+        }
     }
 }
