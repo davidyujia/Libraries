@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>davidyujia.Process</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>davidyujia</Authors>
+    <Company></Company>
+    <description>tools about process</description>
+  </PropertyGroup>
+
+</Project>

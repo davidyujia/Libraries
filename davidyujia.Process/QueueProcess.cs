@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-namespace QueueProcess
+namespace davidyujia.Process.QueueProcess
 {
     public sealed class QueueProcess<T>
     {
