@@ -1,9 +1,11 @@
-# QueueProcess
+using System;
+using System.Threading.Tasks;
+using davidyujia.Process;
 
-```cs
-class Program
+namespace davidyujia.Console
 {
-    private static QueueProcess<int> _process;
+    class Program
+    {private static QueueProcess<int> _process;
 
     static void Main(string[] args)
     {
@@ -18,5 +20,5 @@ class Program
 
         Console.Read();
     }
+    }
 }
-```
