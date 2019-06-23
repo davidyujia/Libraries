@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace davidyujia.Process.QueueProcess
+namespace davidyujia.Process
 {
     public sealed class QueueProcess<T>
     {
@@ -30,20 +31,23 @@ namespace davidyujia.Process.QueueProcess
 
         public async Task AddAsync(T item) => await Task.Factory.StartNew(() => Add(item));
 
-        private bool IsTaskRunning => _task == null || _task.Status != TaskStatus.Running;
+        private bool _isNotRunning => _task == null
+        || _task.Status == TaskStatus.Canceled
+        || _task.Status == TaskStatus.Faulted
+        || _task.Status == TaskStatus.RanToCompletion;
 
         public void Add(T item)
         {
             _queue.Enqueue(item);
 
-            if (!IsTaskRunning)
+            if (!_isNotRunning)
             {
                 return;
             }
 
             lock (_lock)
             {
-                if (!IsTaskRunning)
+                if (!_isNotRunning)
                 {
                     return;
                 }
@@ -55,7 +59,7 @@ namespace davidyujia.Process.QueueProcess
 
         public void Wait()
         {
-            Thread.SpinWait(!IsTaskRunning);
+            SpinWait.SpinUntil(() => _isNotRunning);
         }
     }
 }
