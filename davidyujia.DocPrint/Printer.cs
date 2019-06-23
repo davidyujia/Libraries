@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DocPrint
+namespace davidyujia.DocPrint
 {
     public sealed class Printer
     {
