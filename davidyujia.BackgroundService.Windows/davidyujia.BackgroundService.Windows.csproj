@@ -8,4 +8,8 @@
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="2.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\davidyujia.BackgroundService.Core\davidyujia.BackgroundService.Core.csproj" />
+  </ItemGroup>
+
 </Project>
