@@ -10,7 +10,7 @@ namespace davidyujia.BackgroundService
         BackgroundProcess _backgroundProcess;
         Schedule _schedule;
 
-        private BackgroundService(IPlatformService platformService, BackgroundProcess backgroundProcess, Schedule schedule)
+        private BackgroundService(IPlatformService platformService, BackgroundProcess backgroundProcess, Schedule schedule, string[] args)
         {
             _platformService = platformService;
             _backgroundProcess = backgroundProcess;
