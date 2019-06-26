@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using davidyujia.Process;
+using davidyujia.Configuration;
 
 namespace davidyujia.TestConsole
 {
@@ -9,6 +10,19 @@ namespace davidyujia.TestConsole
         private static QueueProcess<int> _process;
 
         static void Main(string[] args)
+        {
+            Config.GetEnvironmentFunc = () => "Debug";
+            Config.Environment = "";
+            var c = Config.Load();
+
+            var x = c["Run"]["Key"];
+
+            Console.WriteLine(x);
+
+            Console.WriteLine("End");
+        }
+
+        static void ProcessTest()
         {
             var count = 0;
             var random = new Random(Guid.NewGuid().GetHashCode()).Next(100000, 100000);
@@ -26,7 +40,6 @@ namespace davidyujia.TestConsole
             _process.Wait();
             Console.WriteLine(random);
             Console.WriteLine(count);
-            Console.WriteLine("End");
         }
     }
 }

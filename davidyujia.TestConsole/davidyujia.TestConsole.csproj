@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\davidyujia.Process\davidyujia.Process.csproj" />
+    <ProjectReference Include="..\davidyujia.Configuration\davidyujia.Configuration.csproj" />
   </ItemGroup>
   
 </Project>
