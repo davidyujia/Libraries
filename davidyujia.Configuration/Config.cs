@@ -129,6 +129,11 @@ namespace davidyujia.Configuration
             return _config[$"{_parent}"];
         }
 
+        public string ConnectionString()
+        {
+            return string.Empty;
+        }
+
         public IConfiguration Configuration()
         {
             return _config;
