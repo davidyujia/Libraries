@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security;
+using davidyujia.Crypto;
 using Microsoft.Extensions.Configuration;
 
 namespace davidyujia.Configuration
@@ -119,32 +122,65 @@ namespace davidyujia.Configuration
         internal ConfigValue(IConfiguration config, string parent, string key)
         {
             _config = config;
-            _parent = string.IsNullOrEmpty(parent) ? key : $"{parent}:{key}"; ;
+            _thisKey = string.IsNullOrEmpty(parent) ? key : $"{parent}:{key}"; ;
         }
 
-        private string _parent { get; set; }
+        private string _thisKey { get; set; }
+
+        public override string ToString() => _config[$"{_thisKey}"];
+
+        public ConnectionString ConnectionString => string.IsNullOrEmpty(_thisKey) ? null : new ConnectionString(ToString());
+
+        public IConfiguration Configuration => _config;
+
+        public ConfigValue this[string key] => new ConfigValue(_config, _thisKey, key);
+    }
+
+    public sealed class CrypterConfig
+    {
+        internal static Crypter Crypter = new Crypter();
+
+        internal static string SecretString = "Secret:";
+
+        public static string Encryptor(string source)
+        {
+            return SecretString + Crypter.Encrypt(source);
+        }
+
+        public static string Decrypt(string encryptString)
+        {
+            if (!IsNeedDecryptor(encryptString))
+            {
+                return encryptString;
+            }
+
+            var data = encryptString.Substring(CrypterConfig.SecretString.Length, encryptString.Length - CrypterConfig.SecretString.Length);
+
+            return Crypter.Decrypt(data);
+        }
+
+        private static bool IsNeedDecryptor(string str) => string.IsNullOrWhiteSpace(str) ? false : str.StartsWith(CrypterConfig.SecretString);
+    }
+
+    public sealed class ConnectionString
+    {
+        private SecureString _value;
+
+        internal ConnectionString(string value)
+        {
+            _value = new SecureString();
+
+            foreach (var c in CrypterConfig.Decrypt(value))
+            {
+                _value.AppendChar(c);
+            }
+        }
 
         public override string ToString()
         {
-            return _config[$"{_parent}"];
-        }
+            var ptr = Marshal.SecureStringToBSTR(_value);
 
-        public string ConnectionString()
-        {
-            return string.Empty;
-        }
-
-        public IConfiguration Configuration()
-        {
-            return _config;
-        }
-
-        public ConfigValue this[string key]
-        {
-            get
-            {
-                return new ConfigValue(_config, _parent, key);
-            }
+            return Marshal.PtrToStringBSTR(ptr);
         }
     }
 }

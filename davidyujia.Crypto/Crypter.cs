@@ -42,7 +42,6 @@ namespace davidyujia.Crypto
 
     public sealed class Crypter
     {
-
         private Lazy<MachineCode> Machine = new Lazy<MachineCode>(() => new MachineCode());
 
         private CrypterBag CrypterBag { get; }
@@ -74,7 +73,7 @@ namespace davidyujia.Crypto
             return algorithm;
         }
 
-        public string Encode(string source)
+        public string Encrypt(string source)
         {
             var des = CreateAlgorithm();
             var data = Encoding.UTF8.GetBytes(source);
@@ -89,7 +88,7 @@ namespace davidyujia.Crypto
             }
         }
 
-        public string Decode(string encrypt)
+        public string Decrypt(string encrypt)
         {
             var des = CreateAlgorithm();
             var data = Convert.FromBase64String(encrypt);
@@ -103,7 +102,7 @@ namespace davidyujia.Crypto
                 }
             }
         }
-        
+
         internal static RSACryptoServiceProvider GetRsaAlgorithm()
         {
             return new RSACryptoServiceProvider();
@@ -114,7 +113,7 @@ namespace davidyujia.Crypto
             return new RSAKey();
         }
 
-        public static string Encode(string source, string publicKey)
+        public static string Encrypt(string source, string publicKey)
         {
             var rsa = GetRsaAlgorithm();
             rsa.FromXmlString(publicKey);
@@ -122,7 +121,7 @@ namespace davidyujia.Crypto
             return Convert.ToBase64String(encryptData);
         }
 
-        public static string Decode(string encrypt, string privateKey)
+        public static string Decrypt(string encrypt, string privateKey)
         {
             var rsa = GetRsaAlgorithm();
             rsa.FromXmlString(privateKey);
@@ -131,6 +130,5 @@ namespace davidyujia.Crypto
             var decryptString = Encoding.UTF8.GetString(decryptData);
             return decryptString;
         }
-
     }
 }
