@@ -20,7 +20,7 @@ namespace davidyujia.Crypto
     {
         public MachineCode()
         {
-            CrypterBag = new CrypterBag("123", "321");
+            CrypterBag = new CrypterBag(Environment.MachineName, "davidyujia.Crypto");
         }
 
         public CrypterBag CrypterBag { get; }
