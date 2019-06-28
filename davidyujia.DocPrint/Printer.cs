@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Management.Automation;
+using System.Runtime.InteropServices;
 
 namespace davidyujia.DocPrint
 {
@@ -11,21 +15,21 @@ namespace davidyujia.DocPrint
             _printerName = printerName;
         }
 
-        private Action<byte[]> WindowsPlatformPrint = b =>
+        private void WindowsPlatformPrint(byte[] bytes)
         {
             using (var ps = PowerShell.Create())
             {
                 ps.AddCommand("Out-Printer").AddParameters(new Dictionary<string, object>
                 {
                     ["-Name"] = _printerName,
-                    ["-InputObject"] = b,
+                    ["-InputObject"] = bytes,
                 });
 
                 ps.Invoke();
             }
-        };
+        }
 
-        private Action<byte[]> LinuxPlatformPrint = b =>
+        private void LinuxPlatformPrint(byte[] bytes)
         {
             using (var linuxPrintProcess = new Process())
             {
@@ -34,7 +38,7 @@ namespace davidyujia.DocPrint
                 linuxPrintProcess.StandardInput.Write(bytes);
                 linuxPrintProcess.Start();
             }
-        };
+        }
 
         public void Print(byte[] bytes)
         {
@@ -48,7 +52,7 @@ namespace davidyujia.DocPrint
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                throw NotImplementedException("OSX");
+                throw new NotImplementedException("OSX");
             }
             else
             {
