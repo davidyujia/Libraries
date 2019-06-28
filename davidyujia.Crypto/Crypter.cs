@@ -1,31 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace davidyujia.Crypto
 {
-    internal sealed class CrypterBag
-    {
-        public byte[] Key { get; private set; }
-        public byte[] Vector { get; private set; }
-        public CrypterBag(string key, string vector)
-        {
-            Key = Encoding.ASCII.GetBytes(key);
-            Vector = Encoding.ASCII.GetBytes(vector);
-        }
-    }
-
-    internal sealed class MachineCode
-    {
-        public MachineCode()
-        {
-            CrypterBag = new CrypterBag(Environment.MachineName, "davidyujia.Crypto");
-        }
-
-        public CrypterBag CrypterBag { get; }
-    }
-
     public sealed class RSAKey
     {
         internal RSAKey()
@@ -42,12 +23,11 @@ namespace davidyujia.Crypto
 
     public sealed class Crypter
     {
-        private Lazy<MachineCode> Machine = new Lazy<MachineCode>(() => new MachineCode());
-
         private CrypterBag CrypterBag { get; }
 
         public Crypter()
         {
+            CrypterBag = new CrypterBag(Environment.MachineName, Environment.MachineName);
         }
 
         public Crypter(string key, string vector)
@@ -55,21 +35,11 @@ namespace davidyujia.Crypto
             CrypterBag = new CrypterBag(key, vector);
         }
 
-        private byte[] GetKey()
-        {
-            return CrypterBag == null ? Machine.Value.CrypterBag.Key : CrypterBag.Key;
-        }
-
-        private byte[] GetVector()
-        {
-            return CrypterBag == null ? Machine.Value.CrypterBag.Vector : CrypterBag.Vector;
-        }
-
         private SymmetricAlgorithm CreateAlgorithm()
         {
-            SymmetricAlgorithm algorithm = new DESCryptoServiceProvider();
-            algorithm.Key = GetKey();
-            algorithm.IV = GetVector();
+            SymmetricAlgorithm algorithm = new AesCryptoServiceProvider();
+            algorithm.Key = CrypterBag.Key;
+            algorithm.IV = CrypterBag.Vector;
             return algorithm;
         }
 
@@ -83,7 +53,7 @@ namespace davidyujia.Crypto
                 {
                     cs.Write(data, 0, data.Length);
                     cs.FlushFinalBlock();
-                    return Convert.ToBase64String(ms.ToArray());
+                    return Base58.Encode(ms.ToArray());
                 }
             }
         }
@@ -91,7 +61,7 @@ namespace davidyujia.Crypto
         public string Decrypt(string encrypt)
         {
             var des = CreateAlgorithm();
-            var data = Convert.FromBase64String(encrypt);
+            var data = Base58.Decode(encrypt);
             using (MemoryStream ms = new MemoryStream())
             {
                 using (CryptoStream cs = new CryptoStream(ms, des.CreateDecryptor(), CryptoStreamMode.Write))
@@ -118,14 +88,14 @@ namespace davidyujia.Crypto
             var rsa = GetRsaAlgorithm();
             rsa.FromXmlString(publicKey);
             var encryptData = rsa.Encrypt(Encoding.UTF8.GetBytes(source), false);
-            return Convert.ToBase64String(encryptData);
+            return Base58.Encode(encryptData);
         }
 
         public static string Decrypt(string encrypt, string privateKey)
         {
             var rsa = GetRsaAlgorithm();
             rsa.FromXmlString(privateKey);
-            var encryptData = Convert.FromBase64String(encrypt);
+            var encryptData = Base58.Decode(encrypt);
             var decryptData = rsa.Decrypt(encryptData, false);
             var decryptString = Encoding.UTF8.GetString(decryptData);
             return decryptString;

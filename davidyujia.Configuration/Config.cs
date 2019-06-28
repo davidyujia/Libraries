@@ -142,7 +142,7 @@ namespace davidyujia.Configuration
 
         internal static string SecretString = "Secret:";
 
-        public static string Encryptor(string source)
+        public static string Encrypt(string source)
         {
             return SecretString + Crypter.Encrypt(source);
         }
@@ -166,7 +166,7 @@ namespace davidyujia.Configuration
     {
         private SecureString _value;
 
-        internal ConnectionString(string value)
+        public ConnectionString(string value)
         {
             _value = new SecureString();
 
