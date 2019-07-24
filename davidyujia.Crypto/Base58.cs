@@ -13,5 +13,17 @@ namespace davidyujia.Crypto
             'n','o','p','q','r','s','t','u','v',
             'w','x','y','z' };
         }
+
+        private static Base58 base58 = new Base58();
+
+        public static string Encode(byte[] data)
+        {
+            return base58.EncodeCore(data);
+        }
+
+        public static byte[] Decode(string encryptedString)
+        {
+            return base58.DecodeCore(encryptedString);
+        }
     }
 }

@@ -14,9 +14,10 @@ namespace davidyujia.Crypto
         {
             codeTable = new Lazy<char[]>(GetCodeTable);
         }
+
         protected abstract char[] GetCodeTable();
 
-        internal char[] EncodeToCharArray(byte[] data)
+        private char[] EncodeToCharArray(byte[] data)
         {
             if (data == null)
             {
@@ -40,7 +41,7 @@ namespace davidyujia.Crypto
             return sb.ToString().Reverse().ToArray();
         }
 
-        public string Encode(byte[] data)
+        protected string EncodeCore(byte[] data)
         {
             if (data == null)
             {
@@ -64,7 +65,7 @@ namespace davidyujia.Crypto
             return new string(EncodeToCharArray(data));
         }
 
-        public byte[] Decode(string encryptedString)
+        protected byte[] DecodeCore(string encryptedString)
         {
             if (encryptedString == null)
             {
